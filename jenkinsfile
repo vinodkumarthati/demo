@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+
+    tools {
+        maven 'Maven3'  // Name from Jenkins Global Tool Configuration
+        jdk 'jdk11'     // Name from Jenkins Global Tool Configuration
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                echo 'Cloning source code...'
+                git 'https://github.com/vinodkumarthati/demo.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                echo 'Building with Maven...'
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'mvn test'
+            }
+        }
+
+        stage('Run Application') {
+            steps {
+                echo 'Running the Java App...'
+                sh 'java -cp target/maven-demo-1.0.0.jar com.example.App'
+            }
+        }
+    }
+}
