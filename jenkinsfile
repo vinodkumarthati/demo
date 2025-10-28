@@ -2,15 +2,15 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven_3.9'   // exact name from Global Tool Configuration
-        jdk 'JDK_17'        // exact name from Global Tool Configuration
+        maven 'Maven_3.9'
+        jdk 'JDK_17'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 echo 'Cloning source code...'
-                git 'https://github.com/vinodkumarthati/demo.git'
+                git branch: 'main', url: 'https://github.com/vinodkumarthati/demo.git'
             }
         }
 
