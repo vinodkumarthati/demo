@@ -6,6 +6,11 @@ pipeline {
         jdk 'JDK_17'
     }
 
+    environment {
+        IMAGE_NAME = "vinod-demo-app"
+        IMAGE_TAG = "latest"
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -41,6 +46,28 @@ pipeline {
                 archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
             }
         }
+
+        stage('Build Docker Image') {
+            steps {
+                echo "Building Docker image: ${IMAGE_NAME}:${IMAGE_TAG}"
+                script {
+                    sh """
+                        docker build -t ${IMAGE_NAME}:${IMAGE_TAG} .
+                    """
+                }
+            }
+        }
+
+        stage('Run Docker Container') {
+            steps {
+                echo "Running Docker container from image..."
+                script {
+                    sh """
+                        docker run -d -p 8080:8080 --name demo-app ${IMAGE_NAME}:${IMAGE_TAG} || true
+                    """
+                }
+            }
+        }
     }
 
     post {
@@ -48,10 +75,10 @@ pipeline {
             echo 'Pipeline completed.'
         }
         success {
-            echo 'Build successful!'
+            echo '✅ Build successful! Docker image created and running.'
         }
         failure {
-            echo 'Build failed!'
+            echo '❌ Build failed!'
         }
     }
 }
