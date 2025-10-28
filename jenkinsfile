@@ -31,7 +31,7 @@ pipeline {
         stage('Run Application') {
             steps {
                 echo 'Running the Java App...'
-                sh 'java -cp target/maven-demo-1.0.0.jar com.example.App'
+                sh 'java -cp target/demo-1.0.0.jar com.example.App'
             }
         }
 
