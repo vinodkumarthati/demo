@@ -2,37 +2,60 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven3'  // Name from Jenkins Global Tool Configuration
-        jdk 'jdk11'     // Name from Jenkins Global Tool Configuration
+        maven 'Maven3'   // Name from Jenkins Global Tool Configuration
+        jdk 'jdk11'      // Name from Jenkins Global Tool Configuration
     }
 
     stages {
+
         stage('Checkout') {
             steps {
-                echo 'Cloning source code...'
-                git 'https://github.com/vinodkumarthati/demo.git'
+                echo '🔹 Cloning source code...'
+                git branch: 'main', url: 'https://github.com/vinodkumarthati/demo.git'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building with Maven...'
-                sh 'mvn clean package'
+                echo '🔹 Building the project with Maven...'
+                sh 'mvn clean package -DskipTests=false'
             }
         }
 
         stage('Test') {
             steps {
-                echo 'Running tests...'
+                echo '🔹 Running test cases...'
                 sh 'mvn test'
+            }
+            post {
+                always {
+                    echo '📊 Publishing test results...'
+                    junit 'target/surefire-reports/*.xml'
+                }
             }
         }
 
         stage('Run Application') {
             steps {
-                echo 'Running the Java App...'
-                sh 'java -cp target/maven-demo-1.0.0.jar com.example.App'
+                echo '🚀 Running the built Java application...'
+                sh 'java -cp target/*.jar com.example.App'
             }
+        }
+
+        stage('Archive Artifacts') {
+            steps {
+                echo '📦 Archiving JAR file as build artifact...'
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Build, test, and archive completed successfully!'
+        }
+        failure {
+            echo '❌ Build failed. Check console output for errors.'
         }
     }
 }
